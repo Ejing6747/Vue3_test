@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script type="text/javascript">
+      let person = {
+        name: "张三",
+        age: 18,
+      };
+      //模拟vue2中实现响应式
+      // #region
+      /* 
+      let p = {};
+      Object.defineProperty(p, "name", {
+        //添加了下面这句可以删除
+        configurable: true,
+        get() {
+          return person.name;
+        },
+        set(value) {
+          console.log("有人修改了name属性");
+          person.name = value;
+        },
+     });*/
+      //#endregion
+
+      //vue3实现响应式
+      //#region
+      const p = new Proxy(person, {
+        //target是源数据，propName是读取的时候p点的参数
+        get(target, propName) {
+          console.log(`你读取了p身上的${propName}属性`);
+          // return target[propName];
+          return Reflect.get(target, propName);
+        },
+        //set修改和新增的时候都可以调用
+        set(target, propName, value) {
+          console.log(`你修改了p身上的${propName}属性`);
+          target[propName] = value;
+        },
+        deleteProperty(target, propName) {
+          // return delete target[propName];//表面简略写法
+          return Reflect.deleteProperty(target, propName); //实质深沉次代码写法
+        },
+      });
+      //#endregion
+
+      //通过Object.defineProperty获取元素值
+      //#region
+      // let obj = { a: 1, b: 2 };
+      // Object.defineProperty(obj, "c", {
+      //   get() {
+      //     return 3;
+      //   },
+      // });
+      //Object重复定义就会报错，代码直接执行不下去
+      // Object.defineProperty(obj, "c", {
+      //   get() {
+      //     return 4;
+      //   },
+      // });
+      //#endregion
+
+      //通过Reflect.defineProperty获取元素值，Reflect的返回值是一个布尔类型
+      //#region
+      // let obj = { a: 1, b: 2 };
+      // const result1 = Reflect.defineProperty(obj, "c", {
+      //   get() {
+      //     return 3;
+      //   },
+      // });
+      // // Reflect重复定义就不会报错，代码直接执行第一次定义，其返回值为true
+      // const result2 = Reflect.defineProperty(obj, "c", {
+      //   get() {
+      //     return 4;
+      //   },
+      // });
+      // console.log(result1, result2); //结果：true false
+      //#endregion
+    </script>
+  </body>
+</html>
